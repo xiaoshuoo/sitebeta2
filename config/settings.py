@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'your-default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -61,11 +61,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
-DATABASE_URL = os.environ.get('DATABASE_URL')
 DATABASES = {
     'default': dj_database_url.config(
-        default=DATABASE_URL,
+        default=os.getenv('DATABASE_URL'),
         conn_max_age=600,
+        conn_health_checks=True,
         ssl_require=True
     )
 }
@@ -95,13 +95,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Создаем необходимые директории
 REQUIRED_DIRS = [
@@ -109,24 +110,10 @@ REQUIRED_DIRS = [
     os.path.join(MEDIA_ROOT, 'posts'),
     os.path.join(MEDIA_ROOT, 'covers'),
     STATIC_ROOT,
-    os.path.join(BASE_DIR, 'static'),
 ]
 
 for directory in REQUIRED_DIRS:
     os.makedirs(directory, exist_ok=True)
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Добавьте настройки для Render.com
-if os.environ.get('RENDER'):
-    DATABASES['default']['HOST'] = os.environ.get('DB_HOST')
-    DATABASES['default']['PORT'] = os.environ.get('DB_PORT', '5432')
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
-    }
-    ALLOWED_HOSTS = ['*']
-    DEBUG = False
 
 
 
