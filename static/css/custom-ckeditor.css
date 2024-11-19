@@ -1,0 +1,56 @@
+/* Основные стили для редактора */
+.cke_chrome {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0.75rem !important;
+    background: rgba(45, 42, 61, 0.5) !important;
+    backdrop-filter: blur(10px);
+}
+
+.cke_top {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(45, 42, 61, 0.8) !important;
+    padding: 8px !important;
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+.cke_bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(45, 42, 61, 0.8) !important;
+    padding: 8px !important;
+    border-radius: 0 0 0.75rem 0.75rem !important;
+}
+
+/* Стили для кнопок */
+.cke_button {
+    padding: 4px 8px !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s !important;
+}
+
+.cke_button:hover {
+    background: rgba(139, 92, 246, 0.2) !important;
+}
+
+.cke_button_on {
+    background: rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Стили для контента */
+.cke_editable {
+    padding: 20px !important;
+    color: #E2E8F0 !important;
+    font-family: 'Inter', sans-serif !important;
+    line-height: 1.6 !important;
+}
+
+/* Стили для диалоговых окон */
+.cke_dialog_background_cover {
+    background: rgba(26, 22, 37, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.cke_dialog {
+    border-radius: 1rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(45, 42, 61, 0.95) !important;
+} 

@@ -1,0 +1,30 @@
+# Автоматически нормализовать окончания строк
+* text=auto
+
+# Принудительно использовать LF для всех текстовых файлов
+*.py text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.cmd text eol=lf
+
+# Бинарные файлы
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Специальные файлы
+build.sh binary
+start.sh binary

@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: sity-lvo8
+    env: python
+    buildCommand: sh build.sh
+    startCommand: gunicorn config.wsgi:application
+    plan: starter
+    disk:
+      name: blog_data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://django_blog_7f9a_user:qNKOalXZlLxzA7rlrYmbkN96ZJ6oHbbE@dpg-csrl8f1u0jms7392hlrg-a.oregon-postgres.render.com/django_blog_7f9a
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MEDIA_ROOT
+        value: /opt/render/project/src/data/media
+      - key: STATIC_ROOT
+        value: /opt/render/project/src/data/static
+    routes:
+      - type: rewrite
+        source: /media/*
+        destination: /opt/render/project/src/data/media/*
+      - type: rewrite
+        source: /static/*
+        destination: /opt/render/project/src/data/static/*
+
+databases:
+  - name: django-blog-db
+    databaseName: django_blog_7f9a
+    user: django_blog_7f9a_user
+    plan: starter
+    ipAllowList: []
+    settings:
+      max_connections: 100
+      synchronous_commit: 'on'
+      work_mem: '128MB'
+      maintenance_work_mem: '256MB'
+      effective_cache_size: '1GB'
+      shared_buffers: '512MB'
+    disk:
+      name: postgres_data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1

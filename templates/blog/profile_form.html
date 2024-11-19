@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-background cosmic-bg py-8">
+    <div class="max-w-2xl mx-auto px-4">
+        <div class="glass-effect rounded-2xl p-8">
+            <h1 class="text-3xl font-bold text-white mb-6">Редактирование профиля</h1>
+            
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Аватар -->
+                <div class="mb-6">
+                    <label class="block text-gray-400 mb-2">Аватар</label>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative group">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" 
+                                     alt="Avatar" 
+                                     class="w-24 h-24 rounded-full object-cover">
+                            {% else %}
+                                <div class="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center">
+                                    <i class="fas fa-user text-3xl text-purple-400"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg cursor-pointer hover:bg-purple-500/30 transition-all">
+                                <i class="fas fa-camera mr-2"></i>
+                                Изменить аватар
+                                <input type="file" name="avatar" class="hidden" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Обложка -->
+                <div class="mb-6">
+                    <label class="block text-gray-400 mb-2">Обложка профиля</label>
+                    <div class="relative">
+                        {% if profile.cover %}
+                            <img src="{{ profile.cover.url }}" 
+                                 alt="Cover" 
+                                 class="w-full h-32 object-cover rounded-xl">
+                        {% else %}
+                            <div class="w-full h-32 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-image text-3xl text-purple-400"></i>
+                            </div>
+                        {% endif %}
+                        <label class="absolute bottom-2 right-2 px-4 py-2 bg-black/50 text-white rounded-lg cursor-pointer hover:bg-black/70 transition-all">
+                            <i class="fas fa-camera mr-2"></i>
+                            Изменить обложку
+                            <input type="file" name="cover" class="hidden" accept="image/*">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Остальные поля -->
+                {% for field in form %}
+                    {% if field.name not in 'avatar,cover' %}
+                    <div class="mb-6">
+                        <label class="block text-gray-400 mb-2">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-400 text-sm mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Кнопки -->
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'blog:profile' %}" 
+                       class="px-6 py-3 bg-surface/50 text-white rounded-xl hover:bg-surface/70 transition-all">
+                        Отмена
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transition-all">
+                        Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.glass-effect {
+    background: rgba(26, 22, 37, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Стили для полей ввода */
+input[type="text"],
+input[type="url"],
+textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(26, 22, 37, 0.8);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 0.75rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="url"]:focus,
+textarea:focus {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+    outline: none;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.cosmic-bg {
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Обработка загрузки аватара
+    const avatarInput = document.querySelector('input[name="avatar"]');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const formData = new FormData();
+                formData.append('avatar', this.files[0]);
+                
+                // Получаем CSRF токен
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                fetch('{% url "blog:update_profile_avatar" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Обновляем изображение аватара
+                        const avatarImg = document.querySelector('.avatar-container img');
+                        if (avatarImg) {
+                            avatarImg.src = data.avatar_url;
+                        }
+                        // Показываем сообщение об успехе
+                        alert('Аватар успешно обновлен');
+                    } else {
+                        alert('Ошибка при загрузке аватара: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при загрузке файла');
+                });
+            }
+        });
+    }
+
+    // Обработка загрузки обложки
+    const coverInput = document.querySelector('input[name="cover"]');
+    if (coverInput) {
+        coverInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const formData = new FormData();
+                formData.append('cover', this.files[0]);
+                
+                // Получаем CSRF токен
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                fetch('{% url "blog:update_profile_cover" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Обновляем изображение обложки
+                        const coverImg = document.querySelector('.relative img');
+                        if (coverImg) {
+                            coverImg.src = data.cover_url;
+                        }
+                        // Показываем сообщение об успехе
+                        alert('Обложка успешно обновлена');
+                    } else {
+                        alert('Ошибка при загрузке обложки: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при загрузке файла');
+                });
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 
