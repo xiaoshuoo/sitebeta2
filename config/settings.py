@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 load_dotenv()
 
@@ -60,20 +61,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
+DATABASE_URL = os.environ.get('DATABASE_URL')
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
-        'OPTIONS': {
-            'sslmode': 'require'
-        },
-        'CONN_MAX_AGE': 0,
-        'ATOMIC_REQUESTS': False,
-    }
+    'default': dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 # Password validation
@@ -123,6 +117,16 @@ for directory in REQUIRED_DIRS:
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Добавьте настройки для Render.com
+if os.environ.get('RENDER'):
+    DATABASES['default']['HOST'] = os.environ.get('DB_HOST')
+    DATABASES['default']['PORT'] = os.environ.get('DB_PORT', '5432')
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
+    }
+    ALLOWED_HOSTS = ['*']
+    DEBUG = False
 
 
 
