@@ -2,31 +2,21 @@
 # exit on error
 set -o errexit
 
-# Создаем директории для медиа файлов
-mkdir -p media/avatars
-mkdir -p media/posts
-mkdir -p media/covers
-mkdir -p media/thumbnails
+# Create necessary directories
+mkdir -p staticfiles
+mkdir -p static/css
+mkdir -p static/js
+mkdir -p media
 
-# Устанавливаем права на запись
-chmod -R 777 media
-
-# Обновляем pip и устанавливаем зависимости
+# Install dependencies
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 
-# Экспортируем переменные окружения из .env файла
-export $(cat .env | xargs)
+# Clean up old static files
+rm -rf staticfiles/*
 
-# Собираем статические файлы и выполняем миграции
-python manage.py collectstatic --noinput
-python manage.py migrate --noinput
+# Collect static files
+python manage.py collectstatic --no-input --clear
 
-# Создаем необходимые директории
-python manage.py check_media
-
-# Проверяем и восстанавливаем права доступа
-chmod -R 777 media
-
-# Запускаем gunicorn
-exec gunicorn config.wsgi:application --bind=0.0.0.0:$PORT --workers=4
+# Run migrations
+python manage.py migrate
